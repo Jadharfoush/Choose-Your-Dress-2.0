@@ -125,6 +125,7 @@ Resources:
         - !Ref VPCSecurityGroup
       SubnetId: !Ref PublicSubnet
       PrivateIpAddress: 10.0.0.101
+      SourceDestCheck: false
       Tags:
         - Key: Name
           Value: NetworkInterface1
@@ -137,6 +138,7 @@ Resources:
         - !Ref VPCSecurityGroup
       SubnetId: !Ref PublicSubnet
       PrivateIpAddress: 10.0.0.10
+      SourceDestCheck: false
       Tags:
         - Key: Name
           Value: NetworkInterface2
@@ -149,6 +151,7 @@ Resources:
         - !Ref VPCSecurityGroup
       SubnetId: !Ref PrivateSubnet
       PrivateIpAddress: 10.0.1.10
+      SourceDestCheck: false
       Tags:
         - Key: Name
           Value: NetworkInterface3
