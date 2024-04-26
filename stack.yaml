@@ -67,12 +67,25 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
+  
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NetworkInterfaceId: !Ref NetworkInterface3
 
   SubnetRouteTableAssociationPublic:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnet
       RouteTableId: !Ref PublicRouteTable
+
+  SubnetRouteTableAssociationPrivate:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PriavteSubnet
+      RouteTableId: !Ref PrivateRouteTable
 
   VPCSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -141,10 +154,15 @@ Resources:
       NetworkInterfaces:
         - DeviceIndex: 0
           NetworkInterfaceId: !Ref NetworkInterface1
+          SourceDestCheck: false  # Disable Source/Destination Check
+          
         - DeviceIndex: 1
           NetworkInterfaceId: !Ref NetworkInterface2
+          SourceDestCheck: false  # Disable Source/Destination Check
+          
         - DeviceIndex: 2
           NetworkInterfaceId: !Ref NetworkInterface3
+          SourceDestCheck: false  # Disable Source/Destination Check
 
   EIPAssociation1:
     Type: AWS::EC2::EIPAssociation
