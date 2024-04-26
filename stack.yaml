@@ -68,6 +68,14 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
   
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: PrivateRouteTable
+
   PrivateRoute:
     Type: AWS::EC2::Route
     Properties:
@@ -84,7 +92,7 @@ Resources:
   SubnetRouteTableAssociationPrivate:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PriavteSubnet
+      SubnetId: !Ref PrivateSubnet
       RouteTableId: !Ref PrivateRouteTable
 
   VPCSecurityGroup:
@@ -155,17 +163,15 @@ Resources:
         - DeviceIndex: 0
           NetworkInterfaceId: !Ref NetworkInterface1
           SourceDestCheck: false  # Disable Source/Destination Check
-          
         - DeviceIndex: 1
           NetworkInterfaceId: !Ref NetworkInterface2
           SourceDestCheck: false  # Disable Source/Destination Check
-          
         - DeviceIndex: 2
           NetworkInterfaceId: !Ref NetworkInterface3
           SourceDestCheck: false  # Disable Source/Destination Check
       Tags:
         - Key: Name
-          Value: JAD-PRVT         
+          Value: JAD-PUB
 
   EIPAssociation1:
     Type: AWS::EC2::EIPAssociation
@@ -180,24 +186,22 @@ Resources:
       AllocationId: !GetAtt ElasticIP2.AllocationId
 
   EC2InstancePrivate:
-  Type: AWS::EC2::Instance
-  Properties:
-    InstanceType: t2.medium
-    ImageId: ami-023adaba598e661ac  # Ubuntu AMI ID provided
-    KeyName: !Ref KeyName
-    NetworkInterfaces:
-      - AssociatePublicIpAddress: false
-        DeleteOnTermination: true
-        DeviceIndex: 0
-        GroupSet:
-          - !Ref VPCSecurityGroup
-        PrivateIpAddress: 10.0.1.62  # Private IPv4 address provided
-        SubnetId: !Ref PrivateSubnet
-    Tags:
-      - Key: Name
-        Value: JAD-PRVT
-
-          
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.medium
+      ImageId: ami-023adaba598e661ac  # Ubuntu AMI ID provided
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: false
+          DeleteOnTermination: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref VPCSecurityGroup
+          PrivateIpAddress: 10.0.1.62  # Private IPv4 address provided
+          SubnetId: !Ref PrivateSubnet
+      Tags:
+        - Key: Name
+          Value: JAD-PRVT
 
 Outputs:
   VPCId:
