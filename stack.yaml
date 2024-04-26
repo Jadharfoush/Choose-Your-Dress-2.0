@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template for creating a VPC with one public and one private subnet in Frankfurt
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: String
+    Default: JH_KEY
+
+Resources:
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: MyVPC
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: eu-central-1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: eu-central-1a
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: InternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociationPublic:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  VPCSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable all inbound and outbound traffic within the VPC
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - CidrIp: 10.0.0.0/16
+          IpProtocol: -1
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+
+  ElasticIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  ElasticIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NetworkInterface1:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: Network interface 1 with Elastic IP
+      GroupSet:
+        - !Ref VPCSecurityGroup
+      SubnetId: !Ref PublicSubnet
+      PrivateIpAddress: 10.0.0.101
+      Tags:
+        - Key: Name
+          Value: NetworkInterface1
+
+  NetworkInterface2:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: Network interface 2 with Elastic IP
+      GroupSet:
+        - !Ref VPCSecurityGroup
+      SubnetId: !Ref PublicSubnet
+      PrivateIpAddress: 10.0.0.10
+      Tags:
+        - Key: Name
+          Value: NetworkInterface2
+
+  NetworkInterface3:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: Network interface 3 with no public IP and private IP
+      GroupSet:
+        - !Ref VPCSecurityGroup
+      SubnetId: !Ref PrivateSubnet
+      PrivateIpAddress: 10.0.1.10
+      Tags:
+        - Key: Name
+          Value: NetworkInterface3
+
+  EC2InstancePublic:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: c5n.xlarge
+      ImageId: ami-084b269c0a410d0bd  # New AMI ID provided
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          NetworkInterfaceId: !Ref NetworkInterface1
+        - DeviceIndex: 1
+          NetworkInterfaceId: !Ref NetworkInterface2
+        - DeviceIndex: 2
+          NetworkInterfaceId: !Ref NetworkInterface3
+
+  EIPAssociation1:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref NetworkInterface1
+      AllocationId: !GetAtt ElasticIP1.AllocationId
+
+  EIPAssociation2:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      NetworkInterfaceId: !Ref NetworkInterface2
+      AllocationId: !GetAtt ElasticIP2.AllocationId
+
+  EC2InstancePrivate:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.medium
+      ImageId: ami-023adaba598e661ac  # Ubuntu AMI ID provided
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: false
+          DeleteOnTermination: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref VPCSecurityGroup
+          PrivateIpAddress: 10.0.1.62  # Private IPv4 address provided
+          SubnetId: !Ref PrivateSubnet
+
+Outputs:
+  VPCId:
+    Value: !Ref MyVPC
+    Description: VPC Id of the newly created VPC
+  PublicSubnetId:
+    Value: !Ref PublicSubnet
+    Description: Subnet Id of the public subnet
+  PrivateSubnetId:
+    Value: !Ref PrivateSubnet
+    Description: Subnet Id of the private subnet
+  SecurityGroupId:
+    Value: !Ref VPCSecurityGroup
+    Description: Security Group Id for the VPC allowing all inbound and outbound traffic
