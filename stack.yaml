@@ -80,7 +80,7 @@ Resources:
       GroupDescription: Enable all inbound and outbound traffic within the VPC
       VpcId: !Ref MyVPC
       SecurityGroupIngress:
-        - CidrIp: 10.0.0.0/16
+        - CidrIp: 0.0.0.0/0
           IpProtocol: -1
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
@@ -136,7 +136,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: c5n.xlarge
-      ImageId: ami-084b269c0a410d0bd  # New AMI ID provided
+      ImageId: ami-084b269c0a410d0bd  # palo alto firewall 
       KeyName: !Ref KeyName
       NetworkInterfaces:
         - DeviceIndex: 0
