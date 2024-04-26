@@ -162,13 +162,10 @@ Resources:
       NetworkInterfaces:
         - DeviceIndex: 0
           NetworkInterfaceId: !Ref NetworkInterface1
-          SourceDestCheck: false  # Disable Source/Destination Check
         - DeviceIndex: 1
           NetworkInterfaceId: !Ref NetworkInterface2
-          SourceDestCheck: false  # Disable Source/Destination Check
         - DeviceIndex: 2
           NetworkInterfaceId: !Ref NetworkInterface3
-          SourceDestCheck: false  # Disable Source/Destination Check
       Tags:
         - Key: Name
           Value: JAD-PUB
