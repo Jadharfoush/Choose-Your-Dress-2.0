@@ -163,6 +163,9 @@ Resources:
         - DeviceIndex: 2
           NetworkInterfaceId: !Ref NetworkInterface3
           SourceDestCheck: false  # Disable Source/Destination Check
+      Tags:
+        - Key: Name
+          Value: JAD-PRVT         
 
   EIPAssociation1:
     Type: AWS::EC2::EIPAssociation
@@ -177,19 +180,24 @@ Resources:
       AllocationId: !GetAtt ElasticIP2.AllocationId
 
   EC2InstancePrivate:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: t2.medium
-      ImageId: ami-023adaba598e661ac  # Ubuntu AMI ID provided
-      KeyName: !Ref KeyName
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: false
-          DeleteOnTermination: true
-          DeviceIndex: 0
-          GroupSet:
-            - !Ref VPCSecurityGroup
-          PrivateIpAddress: 10.0.1.62  # Private IPv4 address provided
-          SubnetId: !Ref PrivateSubnet
+  Type: AWS::EC2::Instance
+  Properties:
+    InstanceType: t2.medium
+    ImageId: ami-023adaba598e661ac  # Ubuntu AMI ID provided
+    KeyName: !Ref KeyName
+    NetworkInterfaces:
+      - AssociatePublicIpAddress: false
+        DeleteOnTermination: true
+        DeviceIndex: 0
+        GroupSet:
+          - !Ref VPCSecurityGroup
+        PrivateIpAddress: 10.0.1.62  # Private IPv4 address provided
+        SubnetId: !Ref PrivateSubnet
+    Tags:
+      - Key: Name
+        Value: JAD-PRVT
+
+          
 
 Outputs:
   VPCId:
