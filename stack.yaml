@@ -107,16 +107,6 @@ Resources:
         - CidrIp: 0.0.0.0/0
           IpProtocol: -1
 
-  ElasticIP1:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-
-  ElasticIP2:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-
   NetworkInterface1:
     Type: AWS::EC2::NetworkInterface
     Properties:
