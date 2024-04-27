@@ -167,13 +167,13 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties:
       NetworkInterfaceId: !Ref NetworkInterface1
-      AllocationId: !GetAtt ElasticIP1.AllocationId
+      AllocationId: eipalloc-0002359fbc519cf50
 
   EIPAssociation2:
     Type: AWS::EC2::EIPAssociation
     Properties:
       NetworkInterfaceId: !Ref NetworkInterface2
-      AllocationId: !GetAtt ElasticIP2.AllocationId
+      AllocationId: eipalloc-05a5637071145f846
 
   EC2InstancePrivate:
     Type: AWS::EC2::Instance
