@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  JadJKAllowAllSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow all traffic in and out from anywhere
+      VpcId: vpc-0d1b84c1353a899a6  # Specify your VPC ID here
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+
+  NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: "Network Interface for EC2 Instance"
+      SubnetId: subnet-0f3992ae46877737a
+      Tags:
+        - Key: Name
+          Value: NetworkInterface
+      GroupSet:
+        - !Ref JadJKAllowAllSecurityGroup
+
+  ElasticIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: eipalloc-0002359fbc519cf50
+      NetworkInterfaceId: !Ref NetworkInterface
+
+  DeveloperEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.medium
+      ImageId: ami-023adaba598e661ac
+      KeyName: JH_KEY  # Replace with your key pair name
+      NetworkInterfaces:
+        - NetworkInterfaceId: !Ref NetworkInterface
+          DeviceIndex: 0
+      Tags:
+        - Key: Name
+          Value: DEVOPS  # Assigning the name "DEVs" to the instance
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y docker.io
+
+          sudo service docker start
+          sudo usermod -a -G docker ubuntu
+
+          sudo apt install -y openjdk-17-jdk
+          sudo wget -q -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian/jenkins.io-2023.key
+          echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+          sudo apt update
+          sudo apt install -y jenkins
+          sudo systemctl start jenkins
+          sudo systemctl enable jenkins
+
+          # Install Python dependencies
+          sudo apt-get install -y python3-pip
+          sudo apt install -y python3.10-venv
+
+          # Install AWS CLI
+          sudo apt install -y awscli
+
+          # Clone GitHub repository
+          sudo -u ubuntu git clone https://github.com/Jadharfoush/Choose-Your-Dress-2.0.git /home/ubuntu/Choose-Your-Dress-2.0
+          sudo -H -u ubuntu /bin/bash -c 'pip install -r /home/ubuntu/Choose-Your-Dress-2.0/DressUp/requirements.txt'
