@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_DEFAULT_REGION = 'eu-central-1'
+        CF_STACK_NAME = 'jad-stack'
+        GITHUB_REPO_URL = 'https://github.com/Jadharfoush/Choose-Your-Dress-2.0.git'
+        YAML_FILE_PATH = './stack.yaml' // Path to your YAML file inside the repository
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', credentialsId: '', url: "${env.GITHUB_REPO_URL}", changelog: true, poll: false
+            }
+        }
+
+        stage('Setup Python Environment') {
+            steps {
+                dir('DressUp') {
+                    sh 'python3 -m venv venv'
+                    sh '''
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    '''
+                }
+            }
+        }
+
+        stage('Run Validation Tests') {
+            steps {
+                dir('DressUp') {
+                    sh '''
+                    . venv/bin/activate
+                    python manage.py test
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy Palo Alto Instance') {
+            steps {
+                withCredentials([[
+                    $class: 'StringBinding',
+                    credentialsId: 'AWS_ACCESS_KEY_ID',
+                    variable: 'AWS_ACCESS_KEY_ID'
+                ], [
+                    $class: 'StringBinding',
+                    credentialsId: 'AWS_SECRET_ACCESS_KEY',
+                    variable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh "aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws cloudformation deploy --template-file ${env.YAML_FILE_PATH} --stack-name ${env.CF_STACK_NAME} --region ${env.AWS_DEFAULT_REGION}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            dir('DressUp') {
+                echo 'Cleaning up...'
+                sh 'rm -rf venv'
+            }
+            echo 'Pipeline execution completed.'
+        }
+        success {
+            echo 'Validation succeeded.'
+        }
+        failure {
+            echo 'Validation failed.'
+        }
+    }
+}
