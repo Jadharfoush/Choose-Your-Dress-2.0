@@ -52,7 +52,7 @@ jobs:
     - name: Wait for Jenkins Job to Complete
       run: |
         build_number=${{ steps.trigger_jenkins.outputs.build_number }}
-        max_timeout=1800  # Maximum time to wait in seconds.
+        max_timeout=300  # Maximum time to wait in seconds.
         start_time=$(date +%s)
         
         while true; do
@@ -76,7 +76,7 @@ jobs:
             exit 1
           fi
 
-          sleep 300
+          sleep 60
         done
       env:
         JENKINS_USER: ${{ secrets.JENKINS_USER }}
