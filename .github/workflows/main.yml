@@ -76,7 +76,7 @@ jobs:
             exit 1
           fi
 
-          sleep 180
+          sleep 300
         done
       env:
         JENKINS_USER: ${{ secrets.JENKINS_USER }}
