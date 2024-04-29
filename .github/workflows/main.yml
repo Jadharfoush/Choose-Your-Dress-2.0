@@ -34,4 +34,14 @@ jobs:
           docker rmi $(docker images -q) || true  # Remove all existing images, ignoring errors if there are none
           docker pull jadharfoush/chooseyourdress:latest
           docker run -d --name chooseyourdress -p 80:8000 jadharfoush/chooseyourdress:latest
+
+    - name: Testing Private Machine 
+      uses: appleboy/ssh-action@master
+      with:
+        host: 52.57.8.108
+        username: ubuntu
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |      
+         sleep 30
          sudo docker exec chooseyourdress /bin/bash -c "python3 manage.py test dailydressme.tests.TemperatureAPITest.test_temperature_equality_on_client"
