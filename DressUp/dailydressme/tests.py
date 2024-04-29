@@ -5,7 +5,7 @@ class TemperatureAPITest(TestCase):
     def test_temperature_equality(self):
         try:
             # Fetch temperature from custom API
-            response_custom = requests.post('http://3.71.86.177:8000/api/temperature', json={"city": "Oslo"})
+            response_custom = requests.post('http://18.199.124.99:8000/api/temperature', json={"city": "Oslo"})
             response_custom.raise_for_status()  # Raise exception if response status code is not 2xx
             temp_custom = response_custom.json()['temperature']
 
@@ -22,7 +22,7 @@ class TemperatureAPITest(TestCase):
     def test_temperature_equality_on_client(self):  # New test method with a different name
         try:
             # Fetch temperature from custom API
-            response_custom = requests.post('http://3.71.86.177:8000/api/temperature', json={"city": "Oslo"})
+            response_custom = requests.post('http://52.57.8.108:8000/api/temperature', json={"city": "Oslo"})
             response_custom.raise_for_status()  # Raise exception if response status code is not 2xx
             temp_custom = response_custom.json()['temperature']
 
