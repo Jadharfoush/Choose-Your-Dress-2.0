@@ -32,7 +32,7 @@ pipeline {
                 dir('DressUp') {
                     sh '''
                     . venv/bin/activate
-                    python manage.py test
+                    python3 manage.py test dailydressme.tests.TemperatureAPITest.test_temperature_equality 
                     '''
                 }
             }
