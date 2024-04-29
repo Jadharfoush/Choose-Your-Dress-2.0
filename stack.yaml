@@ -189,6 +189,17 @@ Resources:
       Tags:
         - Key: Name
           Value: JAD-PRVT
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y docker.io
+
+          sudo service docker start
+          sudo usermod -a -G docker ubuntu
+          
 
 Outputs:
   VPCId:
