@@ -19,7 +19,7 @@ jobs:
 
     - name: Build and Push Docker Image
       run: docker buildx build --platform linux/amd64 -t jadharfoush/chooseyourdress:latest --push
-      working-directory: ./Choose-Your-Dress-2.0
+      working-directory: ./DressUp
 
 
     - name: Wait for machines to launch 
