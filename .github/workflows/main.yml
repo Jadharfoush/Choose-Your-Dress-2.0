@@ -18,9 +18,7 @@ jobs:
       run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u jadharfoush --password-stdin
 
     - name: Build and Push Docker Image
-      run: |
-        docker buildx build --platform linux/amd64 -t jadharfoush/chooseyourdress:latest --push
-      working-directory: ./DressUp
+      run: docker buildx build --platform linux/amd64 -t jadharfoush/chooseyourdress:latest --push DressUp
 
 
 
