@@ -21,12 +21,6 @@ jobs:
     - name: Build and Push Docker Image
       run: docker buildx build --platform linux/amd64 -t jadharfoush/chooseyourdress:latest --push DressUp
 
-
-
-
-    - name: Wait for machines to launch 
-      run: sleep 600  # 10 minutes * 60 seconds/minute = 600 seconds
-
     - name: Deploy to Private Machine 
       uses: appleboy/ssh-action@master
       with:
