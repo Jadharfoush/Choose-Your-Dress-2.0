@@ -145,7 +145,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: c5n.xlarge
-      ImageId: ami-084b269c0a410d0bd  # palo alto firewall 
+      ImageId: ami-04dbb017cba6ccdf3  # palo alto firewall 
       KeyName: !Ref KeyName
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
