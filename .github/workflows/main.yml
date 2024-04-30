@@ -36,11 +36,11 @@ jobs:
           sudo service docker start
           sudo usermod -a -G docker ubuntu
           
-          docker stop chooseyourdress || true  # Stop existing container if running, ignoring errors if it's not running
-          docker rm chooseyourdress || true    # Remove existing container if it exists, ignoring errors if it doesn't exist
-          docker rmi $(docker images -q) || true  # Remove all existing images, ignoring errors if there are none
-          docker pull jadharfoush/chooseyourdress:latest
-          docker run -d --name chooseyourdress -p 80:8000 jadharfoush/chooseyourdress:latest
+          sudo docker stop chooseyourdress || true  # Stop existing container if running, ignoring errors if it's not running
+          sudo docker rm chooseyourdress || true    # Remove existing container if it exists, ignoring errors if it doesn't exist
+          sudo docker rmi $(docker images -q) || true  # Remove all existing images, ignoring errors if there are none
+          sudo docker pull jadharfoush/chooseyourdress:latest
+          sudo docker run -d --name chooseyourdress -p 80:8000 jadharfoush/chooseyourdress:latest
 
     - name: Testing Private Machine 
       uses: appleboy/ssh-action@master
