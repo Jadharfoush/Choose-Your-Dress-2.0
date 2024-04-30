@@ -29,8 +29,15 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
-         docker stop chooseyourdress || true  # Stop existing container if running, ignoring errors if it's not running
-         docker rm chooseyourdress || true    # Remove existing container if it exists, ignoring errors if it doesn't exist
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y docker.io
+
+          sudo service docker start
+          sudo usermod -a -G docker ubuntu
+          
+          docker stop chooseyourdress || true  # Stop existing container if running, ignoring errors if it's not running
+          docker rm chooseyourdress || true    # Remove existing container if it exists, ignoring errors if it doesn't exist
           docker rmi $(docker images -q) || true  # Remove all existing images, ignoring errors if there are none
           docker pull jadharfoush/chooseyourdress:latest
           docker run -d --name chooseyourdress -p 80:8000 jadharfoush/chooseyourdress:latest
